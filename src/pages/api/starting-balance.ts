@@ -6,7 +6,6 @@
 import type { APIRoute } from "astro";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../../db/database.types";
-import { DEFAULT_USER_ID } from "../../db/supabase.client";
 import { startingBalanceService } from "../../lib/services/starting-balance.service";
 import { upsertStartingBalanceSchema } from "../../lib/validation/starting-balance.validation";
 import {
@@ -18,30 +17,10 @@ import {
   generateRequestId,
 } from "../../lib/utils/error-response.utils";
 import type { SuccessMessageDTO } from "../../types";
+import { getAuthenticatedUser } from "../../lib/utils/auth.utils";
 
 // Disable prerendering for API routes
 export const prerender = false;
-
-/**
- * Helper function to get authenticated user from Supabase session
- * TODO: Enable authentication when auth is implemented
- */
-async function getAuthenticatedUser(): Promise<{ userId: string } | null> {
-  // supabase: SupabaseClient<Database>,
-  // Temporarily disabled - using default user for development
-  // const {
-  //   data: { session },
-  // } = await supabase.auth.getSession();
-  //
-  // if (!session || !session.user) {
-  //   return null;
-  // }
-  //
-  // return { userId: session.user.id };
-
-  // Return default user ID for development
-  return { userId: DEFAULT_USER_ID };
-}
 
 /**
  * GET /api/starting-balance
