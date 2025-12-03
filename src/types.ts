@@ -11,12 +11,13 @@ import type { Database } from "./db/database.types";
 // Database Entity Type Aliases
 // ============================================================================
 
-type StartingBalanceRow =
+export type StartingBalanceRow =
   Database["public"]["Tables"]["starting_balances"]["Row"];
-type EntrySeriesRow = Database["public"]["Tables"]["entry_series"]["Row"];
-type SeriesExceptionRow =
+export type EntrySeriesRow =
+  Database["public"]["Tables"]["entry_series"]["Row"];
+export type SeriesExceptionRow =
   Database["public"]["Tables"]["series_exceptions"]["Row"];
-type AnalyticsEventRow =
+export type AnalyticsEventRow =
   Database["public"]["Tables"]["analytics_events"]["Row"];
 
 // ============================================================================
