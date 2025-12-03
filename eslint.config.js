@@ -20,7 +20,6 @@ const baseConfig = tseslint.config({
   rules: {
     "no-console": "warn",
     "no-unused-vars": "off",
-    "linebreak-style": "off",
   },
 });
 
