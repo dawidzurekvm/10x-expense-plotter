@@ -3,12 +3,7 @@
  * Creates standardized error responses for API endpoints
  */
 
-import type {
-  ValidationErrorDTO,
-  UnauthorizedErrorDTO,
-  NotFoundErrorDTO,
-  InternalServerErrorDTO,
-} from "../../types";
+import type { ValidationErrorDTO, UnauthorizedErrorDTO, NotFoundErrorDTO, InternalServerErrorDTO } from "../../types";
 
 /**
  * Generate a unique request ID for tracking errors
