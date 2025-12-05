@@ -34,7 +34,7 @@ export const GET: APIRoute = async (context) => {
 
   try {
     // 1. Authentication check
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(context.locals.supabase);
     if (!user) {
       console.log(`[WARN] [${requestId}] Unauthorized access attempt to GET export/csv`);
       const error = createUnauthorizedError();

@@ -34,7 +34,7 @@ export const GET: APIRoute = async ({ locals }) => {
     const supabase = locals.supabase as SupabaseClient<Database>;
 
     // Verify user session exists
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(supabase);
     if (!user) {
       console.log(
         `[WARN] [${requestId}] Unauthorized access attempt to GET starting balance`,
@@ -103,7 +103,7 @@ export const PUT: APIRoute = async ({ request, locals }) => {
     const supabase = locals.supabase as SupabaseClient<Database>;
 
     // Verify user session exists
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(supabase);
     if (!user) {
       console.log(
         `[WARN] [${requestId}] Unauthorized access attempt to PUT starting balance`,
@@ -195,7 +195,7 @@ export const DELETE: APIRoute = async ({ locals }) => {
     const supabase = locals.supabase as SupabaseClient<Database>;
 
     // Verify user session exists
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(supabase);
     if (!user) {
       console.log(
         `[WARN] [${requestId}] Unauthorized access attempt to DELETE starting balance`,

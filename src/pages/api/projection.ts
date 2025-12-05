@@ -34,7 +34,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
     const supabase = locals.supabase;
 
     // Verify user session exists
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(supabase);
     if (!user) {
       console.log(`[WARN] [${requestId}] Unauthorized access attempt to GET projection`);
       const error = createUnauthorizedError();
