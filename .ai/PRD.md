@@ -173,7 +173,7 @@ US-002 Authentication: Log in
   - Given invalid credentials, I see an error and remain on the login page.
 
 US-003 Authentication: Log out
-- Description: As a user, I can log out.
+- Description: As a user, I can log out. Log out can be accessed via User menu - dropdown menu with navigation.
 - Acceptance Criteria:
   - When I log out, my session ends and I am shown the login screen.
 
