@@ -16,6 +16,7 @@ import { loginSchema, type LoginValues } from "./schema";
 
 export function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -27,10 +28,31 @@ export function LoginForm() {
 
   const handleSubmit = async (data: LoginValues) => {
     setIsSubmitting(true);
+    setServerError(null);
+
     try {
-      // TODO: Implement login logic
-      console.log("Login data:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to login");
+      }
+
+      // Redirect to dashboard on success
+      window.location.href = "/";
+    } catch (error) {
+      if (error instanceof Error) {
+        setServerError(error.message);
+      } else {
+        setServerError("An unexpected error occurred");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -39,6 +61,11 @@ export function LoginForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        {serverError && (
+          <div className="p-3 text-sm text-destructive bg-destructive/15 rounded-md">
+            {serverError}
+          </div>
+        )}
         <FormField
           control={form.control}
           name="email"
@@ -73,4 +100,3 @@ export function LoginForm() {
     </Form>
   );
 }
-
