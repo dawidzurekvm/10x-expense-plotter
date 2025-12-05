@@ -45,5 +45,3 @@ export const createSupabaseBrowserClient = () => {
 
 // Deprecated: Use createSupabaseServerInstance or createSupabaseBrowserClient instead
 export const supabaseClient = createSupabaseBrowserClient();
-
-export const DEFAULT_USER_ID = "68096235-95aa-4f5f-b48b-dbb368c46ec6";
