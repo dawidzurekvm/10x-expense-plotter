@@ -1,0 +1,26 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { RegisterForm } from "@/components/auth/RegisterForm";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+---
+
+<AuthLayout title="Create Account | 10x Expense Plotter">
+  <Card className="w-full">
+    <CardHeader>
+      <CardTitle>Create Account</CardTitle>
+      <CardDescription>Enter your details below to create your account</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <RegisterForm client:load />
+    </CardContent>
+    <CardFooter className="flex justify-center text-sm text-muted-foreground">
+      <p>
+        Already have an account?{" "}
+        <a href="/login" class="hover:text-primary underline underline-offset-4">
+          Sign in
+        </a>
+      </p>
+    </CardFooter>
+  </Card>
+</AuthLayout>
+

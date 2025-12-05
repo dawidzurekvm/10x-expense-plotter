@@ -1,0 +1,40 @@
+---
+import { Toaster } from "@/components/ui/sonner";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+}
+
+const { title = "10x Expense Plotter" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen flex items-center justify-center bg-muted/50 p-4">
+    <div class="w-full max-w-[600px] space-y-4">
+        <div class="flex flex-col items-center space-y-2 text-center mb-8">
+           <h1 class="text-2xl font-bold tracking-tight">10x Expense Plotter</h1>
+        </div>
+        <slot />
+    </div>
+    <Toaster client:load />
+  </body>
+</html>
+
+<style>
+  html,
+  body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
