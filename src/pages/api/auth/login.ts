@@ -25,6 +25,13 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       });
     }
 
+    if (data.user && !data.user.email_confirmed_at) {
+      await supabase.auth.signOut();
+      return new Response(JSON.stringify({ error: "Please verify your email address before logging in" }), {
+        status: 403,
+      });
+    }
+
     return new Response(JSON.stringify({ user: data.user }), {
       status: 200,
     });

@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
-import { createSupabaseServerInstance } from "../../../db/supabase.client";
+import { createClient } from "@supabase/supabase-js";
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
     const { email, password } = body;
@@ -12,7 +12,16 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       });
     }
 
-    const supabase = createSupabaseServerInstance({ cookies, headers: request.headers });
+    // Create a Supabase client without session persistence to prevent auto-login
+    const supabase = createClient(
+      import.meta.env.SUPABASE_URL,
+      import.meta.env.SUPABASE_KEY,
+      {
+        auth: {
+          persistSession: false,
+        },
+      }
+    );
 
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -34,4 +43,3 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     });
   }
 };
-
