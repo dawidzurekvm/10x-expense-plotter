@@ -1,8 +1,11 @@
 ---
-import Welcome from "../components/Welcome.astro";
 import Layout from "../layouts/Layout.astro";
+import { DashboardLayout } from "../components/layout/DashboardLayout";
+import { Dashboard } from "../components/dashboard/Dashboard";
 ---
 
-<Layout>
-  <Welcome />
+<Layout title="10x Expense Plotter">
+  <DashboardLayout client:load>
+    <Dashboard client:load />
+  </DashboardLayout>
 </Layout>
