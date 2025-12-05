@@ -2,10 +2,12 @@
 import Layout from "../layouts/Layout.astro";
 import { DashboardLayout } from "../components/layout/DashboardLayout";
 import { Dashboard } from "../components/dashboard/Dashboard";
+
+const { user } = Astro.locals;
 ---
 
 <Layout title="10x Expense Plotter">
-  <DashboardLayout client:load>
+  <DashboardLayout client:load user={user}>
     <Dashboard client:load />
   </DashboardLayout>
 </Layout>
