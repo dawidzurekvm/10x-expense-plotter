@@ -22,7 +22,9 @@ export function useDashboardData() {
 
   const fetchStartingBalance = useCallback(async () => {
     try {
-      const response = await fetch("/api/starting-balance");
+      const response = await fetch("/api/starting-balance", {
+        headers: { "Cache-Control": "no-cache" }
+      });
       if (response.status === 404) {
         setState((prev) => ({
           ...prev,
@@ -53,7 +55,9 @@ export function useDashboardData() {
     setState((prev) => ({ ...prev, isLoading: true }));
     try {
       const dateStr = date.toISOString().split("T")[0];
-      const response = await fetch(`/api/projection?date=${dateStr}`);
+      const response = await fetch(`/api/projection?date=${dateStr}`, {
+        headers: { "Cache-Control": "no-cache" }
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
