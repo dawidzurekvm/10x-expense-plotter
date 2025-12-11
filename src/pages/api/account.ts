@@ -30,6 +30,7 @@ export const prerender = false;
  * 2. entry_series
  * 3. starting_balances
  * 4. analytics_events
+ * 5. auth.users (via Supabase Edge Function)
  */
 export const DELETE: APIRoute = async ({ request, locals }) => {
   const requestId = generateRequestId();
@@ -179,12 +180,54 @@ export const DELETE: APIRoute = async ({ request, locals }) => {
       `[INFO] [${requestId}] Deleted analytics_events for user ${userId}`
     );
 
-    // Note: Auth user deletion requires Service Role Key (admin API)
-    // For MVP without Service Role, we've deleted all public schema data
-    // The client should sign out after receiving success response
+    // 5. Delete the user account from auth.users via Edge Function
+    // Get the user's access token to authenticate with the Edge Function
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      console.error(
+        `[ERROR] [${requestId}] No access token available for user ${userId}`
+      );
+      const errorResponse = createInternalServerError(requestId);
+      return new Response(JSON.stringify(errorResponse.body), {
+        status: errorResponse.status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Call the Edge Function to delete the auth user
+    // Use SUPABASE_FUNCTIONS_URL for local development, fallback to SUPABASE_URL for production
+    const functionsBaseUrl = import.meta.env.SUPABASE_FUNCTIONS_URL || import.meta.env.SUPABASE_URL;
+    const edgeFunctionUrl = `${functionsBaseUrl}/functions/v1/delete-account`;
+    const edgeFunctionResponse = await fetch(edgeFunctionUrl, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!edgeFunctionResponse.ok) {
+      const errorData = await edgeFunctionResponse.json().catch(() => ({}));
+      console.error(
+        `[ERROR] [${requestId}] Edge Function failed to delete auth user ${userId}:`,
+        errorData
+      );
+      const errorResponse = createInternalServerError(requestId);
+      return new Response(JSON.stringify(errorResponse.body), {
+        status: errorResponse.status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     console.log(
-      `[INFO] [${requestId}] Successfully deleted all data for user ${userId}`
+      `[INFO] [${requestId}] Deleted auth user for user ${userId}`
+    );
+
+    console.log(
+      `[INFO] [${requestId}] Successfully deleted all data and account for user ${userId}`
     );
 
     const response: DeleteAccountResponseDTO = {

@@ -3,8 +3,13 @@ import { type AstroCookies } from "astro";
 
 import type { Database } from "./database.types.ts";
 
+// Server-side env vars (not exposed to client)
 const supabaseUrl = import.meta.env.SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.SUPABASE_KEY;
+
+// Client-side env vars (must be prefixed with PUBLIC_ to be exposed to browser)
+const publicSupabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+const publicSupabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
 export const cookieOptions: CookieOptionsWithName = {
   path: "/",
@@ -40,8 +45,6 @@ export const createSupabaseServerInstance = (context: {
 };
 
 export const createSupabaseBrowserClient = () => {
-  return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
+  return createBrowserClient<Database>(publicSupabaseUrl, publicSupabaseAnonKey);
 };
 
-// Deprecated: Use createSupabaseServerInstance or createSupabaseBrowserClient instead
-export const supabaseClient = createSupabaseBrowserClient();
