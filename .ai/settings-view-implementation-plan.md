@@ -10,7 +10,7 @@ The Settings View serves as the central hub for user account management. It allo
 
 ## 3. Dependencies
 - **Delete Account Endpoint:** See `.ai/delete-account-endpoint-implementation-plan.md` for the backend API that must be implemented to support account deletion.
-- **Shadcn Tabs Component:** Must be installed via `npx shadcn@latest add tabs` before implementation.
+- **Shadcn Components:** Tabs (`npx shadcn@latest add tabs`), AlertDialog, Card, Select, Input, Button, Label
 
 ## 4. Component Structure
 
@@ -32,7 +32,7 @@ src/pages/settings.astro (Page/Layout Root)
             │   └── TabsTrigger (value="privacy")
             ├── TabsContent (value="wallet")
             │   └── WalletSettings
-            │       └── StartingBalanceForm (Reused/Refactored)
+            │       └── (inline form, not separate StartingBalanceForm)
             ├── TabsContent (value="account")
             │   └── AccountSettings
             │       └── ChangePasswordForm
@@ -49,53 +49,27 @@ src/pages/settings.astro (Page/Layout Root)
 - **Description:** Main React container for the settings logic. Uses Radix UI Tabs (via shadcn) which manages active tab state internally.
 - **Main Elements:** `div` container, `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` (all from `@/components/ui/tabs`).
 - **Props:** `initialStartingBalance` (optional, passed from Astro Server).
-- **Example Structure:**
-  ```tsx
-  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-  
-  export function SettingsPage({ initialStartingBalance }: SettingsPageProps) {
-    return (
-      <div className="container py-6">
-        <h1 className="text-2xl font-bold mb-6">Settings</h1>
-        <Tabs defaultValue="wallet">
-          <TabsList>
-            <TabsTrigger value="wallet">Wallet</TabsTrigger>
-            <TabsTrigger value="account">Account</TabsTrigger>
-            <TabsTrigger value="privacy">Data & Privacy</TabsTrigger>
-          </TabsList>
-          <TabsContent value="wallet">
-            <WalletSettings initialStartingBalance={initialStartingBalance} />
-          </TabsContent>
-          <TabsContent value="account">
-            <AccountSettings />
-          </TabsContent>
-          <TabsContent value="privacy">
-            <PrivacySettings />
-          </TabsContent>
-        </Tabs>
-      </div>
-    );
-  }
-  ```
+- **Implementation Notes:**
+  - Uses `container mx-auto max-w-4xl` for layout
+  - TabsList uses `grid grid-cols-3` for equal-width tabs
 
 ### `WalletSettings` (`src/components/settings/WalletSettings.tsx`)
-- **Description:** Layout wrapper for wallet-related settings.
-- **Main Elements:** `Card`, `CardHeader`, `CardContent` containing `StartingBalanceForm`.
-- **Purpose:** Provides context and layout for the form.
-
-### `StartingBalanceForm` (Refactor/Reuse `src/components/dashboard/StartingBalanceForm.tsx`)
-- **Description:** Form to upsert the starting balance.
-- **Main Elements:**
-  - `Form` (react-hook-form)
-  - `DatePicker` (Effective Date)
-  - `Input` (Amount, type="number", step="0.01")
-  - `Button` (Save)
-- **Handled Interactions:**
-  - `onSubmit`: Calls `startingBalanceService.upsertStartingBalance`.
-- **Validation:**
-  - `amount`: Required, Positive, Max 2 decimals.
-  - `effective_date`: Required, Valid date.
-- **Types:** `UpsertStartingBalanceCommand`.
+- **Description:** Card wrapper containing the starting balance form.
+- **Main Elements:** `Card`, `CardHeader`, `CardContent`, inline form with react-hook-form.
+- **Implementation Notes:**
+  - Form is implemented inline (not as a separate `StartingBalanceForm` component)
+  - Uses native `<input type="date">` instead of a DatePicker component
+  - Calls `PUT /api/starting-balance` endpoint
+  - Currency hardcoded as "PLN"
+- **Validation Schema:**
+  ```typescript
+  const startingBalanceFormSchema = z.object({
+    amount: z.number()
+      .min(0, "Amount cannot be negative")
+      .max(9999999999.99, "Amount is too large"),
+    effective_date: z.string().min(1, "Date is required"),
+  });
+  ```
 
 ### `AccountSettings` (`src/components/settings/AccountSettings.tsx`)
 - **Description:** Wrapper for account security settings.
@@ -104,50 +78,57 @@ src/pages/settings.astro (Page/Layout Root)
 ### `ChangePasswordForm` (`src/components/settings/ChangePasswordForm.tsx`)
 - **Description:** Form to update the user's password.
 - **Main Elements:**
-  - `Input` (New Password)
-  - `Input` (Confirm Password)
+  - `Input` (New Password, type="password")
+  - `Input` (Confirm Password, type="password")
   - `Button` (Update Password)
 - **Handled Interactions:**
-  - `onSubmit`: Calls `supabase.auth.updateUser({ password })`.
+  - `onSubmit`: Calls `POST /api/auth/change-password` (server-side API route)
 - **Validation:**
-  - Min length (e.g., 6 chars).
-  - Passwords must match.
-- **State:** `isLoading`, `successMessage`, `errorMessage`.
+  - Min length: 6 characters
+  - Passwords must match (using Zod `.refine()`)
+- **State:** `isLoading`, uses `reset()` on success
+- **Implementation Note:** Uses a server-side API endpoint instead of direct Supabase client SDK call for better security.
 
 ### `PrivacySettings` (`src/components/settings/PrivacySettings.tsx`)
 - **Description:** Container for Data & Privacy actions.
-- **Main Elements:** Stack containing `ExportDataCard` and `DeleteAccountCard`.
+- **Main Elements:** Stack (`div` with `space-y-6`) containing `ExportDataCard` and `DeleteAccountCard`.
 
 ### `ExportDataCard` (`src/components/settings/ExportDataCard.tsx`)
-- **Description:** Card allowing users to download their data.
+- **Description:** Card allowing users to download their data as CSV.
 - **Main Elements:**
-  - `DatePickerWithRange` (Optional: From/To dates)
-  - `Select` (Optional: Entry Type filter)
+  - Two native `<input type="date">` fields (From/To dates) - **NOT DatePickerWithRange**
+  - `Select` (Entry Type filter: all/income/expense)
   - `Button` ("Download CSV")
 - **Handled Interactions:**
-  - `onClick`: Constructs URL `/api/export/csv?from=...&to=...` and triggers download (or uses `window.open`).
+  - `onClick`: Constructs URL `/api/export/csv?from_date=...&to_date=...&entry_type=...`
+  - Downloads via Blob and programmatic link click
+  - Filename format: `expense-plotter-export-YYYY-MM-DD.csv`
+- **State:** `isExporting`, `fromDate`, `toDate`, `entryType`
 
 ### `DeleteAccountCard` (`src/components/settings/DeleteAccountCard.tsx`)
 - **Description:** High-friction area for account deletion.
 - **Main Elements:**
-  - `Card` (Destructive styling hint)
+  - `Card` (with `border-destructive/50` styling)
+  - `CardTitle` (with `text-destructive` class)
   - `Button` (Trigger: "Delete Account", Variant: Destructive)
-  - `DeleteAccountDialog` (Child component).
+  - `DeleteAccountDialog` (Child component, controlled via `isDialogOpen` state)
 
 ### `DeleteAccountDialog` (`src/components/settings/DeleteAccountDialog.tsx`)
-- **Description:** Modal confirming account deletion.
+- **Description:** Modal confirming account deletion with high-friction confirmation.
 - **Main Elements:**
-  - `AlertDialog`
+  - `AlertDialog` (controlled component with `open`/`onOpenChange` props)
+  - `AlertDialogHeader` with warning message and bullet list of data to be deleted
   - `Label`: "Type DELETE MY ACCOUNT to confirm"
-  - `Input`: Validation text field.
-  - `AlertDialogAction`: Disabled until input matches.
+  - `Input`: Validation text field
+  - `AlertDialogAction`: Disabled until input matches, styled with destructive colors
 - **Handled Interactions:**
-  - `onConfirm`: POST to `/api/account` (DELETE method not supported by HTML forms, so use fetch DELETE).
-  - On success: `supabase.auth.signOut()` and redirect to `/`.
+  - `onConfirm`: `DELETE /api/account` with `{ confirmation: "DELETE MY ACCOUNT" }`
+  - On success: `supabase.auth.signOut()` via `createSupabaseBrowserClient()`, then redirect to `/`
+- **State:** `confirmationInput`, `isDeleting`
 
 ## 6. Types
 
-### View Models & Props
+### View Models & Props (in `src/types.ts`)
 - **`SettingsPageProps`**:
   ```typescript
   interface SettingsPageProps {
@@ -155,24 +136,32 @@ src/pages/settings.astro (Page/Layout Root)
   }
   ```
 
-- **`ExportDataState`**:
+- **`DeleteAccountCommand`**:
   ```typescript
-  interface ExportDataState {
-    dateRange: DateRange | undefined;
-    entryType: EntryType | 'all';
+  interface DeleteAccountCommand {
+    confirmation: "DELETE MY ACCOUNT";
+  }
+  ```
+
+- **`DeleteAccountResponseDTO`**:
+  ```typescript
+  interface DeleteAccountResponseDTO {
+    message: string;
   }
   ```
 
 ### DTOs (Existing in `src/types.ts`)
 - `UpsertStartingBalanceCommand`
 - `StartingBalanceDTO`
-- `DeleteAccountCommand` (`{ confirmation: "DELETE MY ACCOUNT" }`)
+
+### Notes on Types
+- `ExportDataState` type from original plan was **NOT** needed - component uses local `useState` hooks directly
 
 ## 7. State Management
 - **Global Auth State:** Uses existing auth hooks/context to get `userId` or Supabase client.
-- **Starting Balance:** Uses `useQuery` or `useEffect` to fetch if not passed as prop, or manages local form state initialized by prop.
+- **Starting Balance:** Initialized via `initialStartingBalance` prop from Astro server-side fetch.
 - **Forms:** Managed via `react-hook-form` + `zod` resolvers.
-- **Async Status:** Local `useState` for `isSubmitting`, `error`, `success` messages within each card/form.
+- **Async Status:** Local `useState` for `isLoading`/`isSubmitting`, `error` messages via `sonner` toasts.
 
 ## 8. API Integration
 
@@ -183,109 +172,104 @@ src/pages/settings.astro (Page/Layout Root)
 
 ### 2. Export Data
 - **Endpoint:** `GET /api/export/csv`
-- **Params:** `from_date`, `to_date`, `entry_type`
-- **Action:** Browser navigation or Blob download.
+- **Query Params:** `from_date`, `to_date`, `entry_type`
+- **Response:** CSV file with `Content-Disposition: attachment` header
+- **Notes:**
+  - If `from_date` not provided, defaults to starting balance effective date
+  - If `to_date` not provided, defaults to current date + 10 years
 
 ### 3. Change Password
-- **Client SDK:** `supabase.auth.updateUser({ password: ... })`
-- **Note:** Does not use our internal API proxy, interacts directly with Supabase Auth.
+- **Endpoint:** `POST /api/auth/change-password`
+- **Request:** `{ newPassword: string }`
+- **Response:** `{ success: true }` or `{ error: string }`
+- **Implementation:** Server-side API route that calls `supabase.auth.updateUser({ password })`
+- **Note:** Original plan specified direct Supabase client SDK call, but implementation uses server-side API for better security
 
 ### 4. Delete Account
 - **Endpoint:** `DELETE /api/account`
 - **Request:** `DeleteAccountCommand`
-- **Headers:** `Content-Type: application/json`
-- **Response:** `{ message: string }`
+- **Response:** `DeleteAccountResponseDTO`
+- **Implementation Details:**
+  1. Validates confirmation string via Zod schema (`account.validation.ts`)
+  2. Deletes user data in order: `series_exceptions` → `entry_series` → `starting_balances` → `analytics_events`
+  3. Calls Supabase Edge Function `delete-account` to delete auth user
+  4. Edge Function uses service role key to call `auth.admin.deleteUser()`
 
-## 9. User Interactions
-1.  **Navigate to Settings:** Click "Settings" in User Menu -> Load `/settings`.
-2.  **Update Balance:** Switch to Wallet tab -> Edit amount/date -> Click Save -> Show toast success -> Update projection (if cached).
-3.  **Change Password:** Switch to Account tab -> Enter new password twice -> Click Update -> Show toast success.
-4.  **Export Data:** Switch to Privacy tab -> Select Range (optional) -> Click Export -> Browser downloads file.
-5.  **Delete Account:** Privacy tab -> Click Delete -> Modal opens -> Type confirmation -> Click Confirm -> App redirects to Login.
+## 9. Validation Files
 
-## 10. Conditions and Validation
-- **Starting Balance:**
-  - Prevent submission if amount < 0.
-  - Prevent submission if date is invalid.
-  - Show field errors inline.
-- **Password:**
-  - `newPassword === confirmPassword`.
-  - `newPassword.length >= 6`.
-- **Delete Account:**
-  - Confirmation button **disabled** until input value strictly equals "DELETE MY ACCOUNT".
-
-## 11. Error Handling
-- **API Errors (4xx/5xx):** Display using `sonner` toast notifications (e.g., "Failed to update balance").
-- **Validation Errors:** Displayed via `FormMessage` components in Shadcn forms.
-- **Auth Errors:** Redirect to login if 401 received during API calls.
-
-## 12. Implementation Steps
-
-1.  **Install Shadcn Tabs Component**
-    - Run: `npx shadcn@latest add tabs`
-    - This creates `src/components/ui/tabs.tsx`
-
-2.  **Frontend: Setup Page**
-    - Create `src/pages/settings.astro`.
-    - Apply `DashboardLayout` **with `client:load` directive**.
-    - Fetch initial starting balance server-side.
-    - **⚠️ CRITICAL:** Ensure `SettingsPage` uses `client:load`:
-      ```astro
-      ---
-      import Layout from "../layouts/Layout.astro";
-      import { DashboardLayout } from "../components/layout/DashboardLayout";
-      import { SettingsPage } from "../components/settings/SettingsPage";
-      // ... fetch starting balance ...
-      ---
-      <Layout title="Settings">
-        <DashboardLayout client:load user={user}>
-          <SettingsPage client:load initialStartingBalance={startingBalance} />
-        </DashboardLayout>
-      </Layout>
-      ```
-
-3.  **Frontend: Create Components**
-    - Create folder `src/components/settings`.
-    - Implement `SettingsPage.tsx` using `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` from `@/components/ui/tabs`.
-    - Implement `WalletSettings.tsx` reusing/adapting `StartingBalanceForm`.
-    - Implement `ChangePasswordForm.tsx` with Zod validation.
-    - Implement `ExportDataCard.tsx` with date range picker.
-    - Implement `DeleteAccountDialog.tsx` and `DeleteAccountCard.tsx`.
-
-4.  **Integration**
-    - Connect components to `src/pages/settings.astro`.
-    - Ensure `StartingBalanceForm` correctly calls the `PUT` endpoint.
-    - Connect `DeleteAccountDialog` to the `DELETE /api/account` endpoint.
-
-5.  **Testing**
-    - **First verify tabs work:** Click each tab and confirm content switches.
-    - Verify flow: Login -> Settings -> Update Balance -> Verify persistence.
-    - Verify flow: Export CSV -> Check file content.
-    - Verify flow: Delete Account -> Type wrong string (blocked) -> Type correct string -> Account deleted & Logout.
-
-## 13. Common Issues & Troubleshooting
-
-### Tabs Not Working (Clicks Do Nothing)
-
-**Symptom:** Clicking on tab triggers does nothing; the content doesn't switch.
-
-**Cause:** React components in Astro are rendered as static HTML by default. Without hydration, no JavaScript runs, so event handlers don't work.
-
-**Solution:** Add `client:load` directive to all interactive React components in the Astro page:
-
-```astro
-<!-- ❌ WRONG - No hydration, tabs won't work -->
-<SettingsPage initialStartingBalance={startingBalance} />
-
-<!-- ✅ CORRECT - Component is hydrated, tabs will work -->
-<SettingsPage client:load initialStartingBalance={startingBalance} />
+### `src/lib/validation/account.validation.ts`
+```typescript
+export const deleteAccountSchema = z.object({
+  confirmation: z.literal("DELETE MY ACCOUNT", {
+    errorMap: () => ({
+      message: 'Confirmation must be exactly "DELETE MY ACCOUNT"',
+    }),
+  }),
+}) satisfies z.ZodSchema<DeleteAccountCommand>;
 ```
 
-### Tabs Component Not Found
+### `src/lib/validation/export.validation.ts`
+- Validates `from_date`, `to_date` (optional, YYYY-MM-DD format)
+- Validates `entry_type` (optional, "income" | "expense")
 
-**Symptom:** Import error for `@/components/ui/tabs`.
+## 10. User Interactions
+1.  **Navigate to Settings:** Click "Settings" in User Menu → Load `/settings`.
+2.  **Update Balance:** Switch to Wallet tab → Edit amount/date → Click Save → Show toast success.
+3.  **Change Password:** Switch to Account tab → Enter new password twice → Click Update → Show toast success → Form resets.
+4.  **Export Data:** Switch to Privacy tab → Select Range (optional) → Click Export → Browser downloads file.
+5.  **Delete Account:** Privacy tab → Click Delete → Modal opens → Type confirmation → Click Confirm → Account deleted → Redirected to `/`.
 
-**Solution:** Install the tabs component:
-```bash
-npx shadcn@latest add tabs
+## 11. Conditions and Validation
+- **Starting Balance:**
+  - Amount must be ≥ 0
+  - Amount max: 9999999999.99
+  - Date is required (validated via Zod string min length)
+  - Show field errors inline via `<p className="text-sm text-destructive">`
+- **Password:**
+  - `newPassword.length >= 6`
+  - `newPassword === confirmPassword` (Zod refine)
+- **Delete Account:**
+  - Confirmation button **disabled** until input strictly equals "DELETE MY ACCOUNT"
+  - Server-side validation also requires exact literal match
+
+## 12. Error Handling
+- **API Errors (4xx/5xx):** Display using `sonner` toast notifications (`toast.error()`)
+- **Validation Errors:** Displayed inline via conditional `<p>` elements with `text-destructive` class
+- **Auth Errors:** Handled by middleware redirect to `/login`
+
+## 13. File Structure
+
+```
+src/
+├── components/
+│   └── settings/
+│       ├── index.ts                  (barrel exports)
+│       ├── SettingsPage.tsx         
+│       ├── WalletSettings.tsx       
+│       ├── AccountSettings.tsx      
+│       ├── ChangePasswordForm.tsx   
+│       ├── PrivacySettings.tsx      
+│       ├── ExportDataCard.tsx       
+│       ├── DeleteAccountCard.tsx    
+│       └── DeleteAccountDialog.tsx  
+├── lib/
+│   ├── services/
+│   │   └── export.service.ts        
+│   └── validation/
+│       ├── account.validation.ts    
+│       └── export.validation.ts     
+├── pages/
+│   ├── settings.astro               
+│   └── api/
+│       ├── account.ts                (DELETE endpoint)
+│       ├── auth/
+│       │   └── change-password.ts    (POST endpoint)
+│       └── export/
+│           └── csv.ts                (GET endpoint)
+└── types.ts                          (DeleteAccountCommand, DeleteAccountResponseDTO)
+
+supabase/
+└── functions/
+    └── delete-account/
+        └── index.ts                  (Edge Function for auth user deletion)
 ```
