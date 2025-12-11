@@ -8,6 +8,15 @@ A modern, opinionated starter template for building fast, accessible, and AI-fri
 - [React](https://react.dev/) v19.0.0 - UI library for building interactive components
 - [TypeScript](https://www.typescriptlang.org/) v5 - Type-safe JavaScript
 - [Tailwind CSS](https://tailwindcss.com/) v4.0.17 - Utility-first CSS framework
+- [Supabase](https://supabase.com/) - Backend and database platform
+
+### Testing
+
+- [Vitest](https://vitest.dev/) - Unit and integration testing framework
+- [React Testing Library](https://testing-library.com/react) - Component testing
+- [Playwright](https://playwright.dev/) - End-to-end testing
+
+**📖 [View Testing Documentation](./TESTING.md)**
 
 ## Prerequisites
 
@@ -43,11 +52,25 @@ npm run build
 
 ## Available Scripts
 
+### Development
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
+
+### Code Quality
 - `npm run lint` - Run ESLint
 - `npm run lint:fix` - Fix ESLint issues
+- `npm run format` - Format code with Prettier
+
+### Testing
+- `npm test` - Run unit tests in watch mode
+- `npm run test:ui` - Run tests with UI interface
+- `npm run test:coverage` - Generate test coverage report
+- `npm run test:unit` - Run only unit tests
+- `npm run test:integration` - Run only integration tests
+- `npm run test:e2e` - Run end-to-end tests
+- `npm run test:e2e:ui` - Run E2E tests with UI
+- `npm run test:e2e:debug` - Debug E2E tests
 
 ## API Documentation
 
@@ -79,9 +102,16 @@ This project provides a comprehensive REST API for managing personal finances, i
 │   │   ├── validation/    # Zod validation schemas
 │   │   └── utils/         # Utility functions
 │   ├── db/                # Supabase client and types
+│   ├── test/              # Test setup and configuration
 │   └── assets/            # Static assets
+├── tests/
+│   ├── unit/              # Unit tests
+│   └── integration/       # Integration tests
+├── e2e/                   # End-to-end tests (Playwright)
 ├── public/                # Public assets
 ├── .ai/                   # API documentation and plans
+├── .github/
+│   └── workflows/         # CI/CD pipelines
 └── supabase/              # Database migrations
 ```
 

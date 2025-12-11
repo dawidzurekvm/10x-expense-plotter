@@ -5,8 +5,13 @@ Frontend:
 - Tailwind 4
 - Shadcn/ui
 
-Backend i baza danych
+Backend i baza danych:
 - Supabase
+
+Testing:
+- Vitest - testy jednostkowe i integracyjne
+- React Testing Library - testowanie komponentów
+- Playwright - testy end-to-end (E2E)
 
 CI/CD i Hosting:
 - Github Actions
