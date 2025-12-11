@@ -1,0 +1,6 @@
+# Unit Tests
+
+This directory contains unit tests using Vitest.
+
+Place unit tests next to the source files or in this directory.
+

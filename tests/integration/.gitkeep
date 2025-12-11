@@ -1,0 +1,6 @@
+# Integration Tests
+
+This directory contains integration tests using Vitest.
+
+Test API endpoints, database interactions, and component integrations here.
+
