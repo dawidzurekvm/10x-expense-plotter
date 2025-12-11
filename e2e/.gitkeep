@@ -1,9 +1,0 @@
-# Playwright E2E Tests
-
-This directory contains end-to-end tests using Playwright.
-
-## Structure
-- Place page object models in `e2e/pages/`
-- Place test fixtures in `e2e/fixtures/`
-- Place helper utilities in `e2e/utils/`
-
