@@ -1,0 +1,30 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { DashboardLayout } from "../components/layout/DashboardLayout";
+import { SettingsPage } from "../components/settings/SettingsPage";
+import { startingBalanceService } from "../lib/services/starting-balance.service";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "../db/database.types";
+
+const { user, supabase } = Astro.locals;
+
+// Fetch starting balance server-side
+let startingBalance = null;
+if (user) {
+  try {
+    startingBalance = await startingBalanceService.getStartingBalance(
+      supabase as SupabaseClient<Database>,
+      user.id
+    );
+  } catch (error) {
+    console.error("Failed to fetch starting balance:", error);
+  }
+}
+---
+
+<Layout title="Settings - 10x Expense Plotter">
+  <DashboardLayout client:load user={user}>
+    <SettingsPage client:load initialStartingBalance={startingBalance} />
+  </DashboardLayout>
+</Layout>
+

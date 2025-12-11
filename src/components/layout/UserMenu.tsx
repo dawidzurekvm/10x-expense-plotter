@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, Settings, User } from "lucide-react";
+import { LayoutDashboard, LogOut, Settings, User } from "lucide-react";
 import { toast } from "sonner";
 
 interface UserMenuProps {
@@ -19,6 +19,7 @@ interface UserMenuProps {
 }
 
 export const UserMenu: React.FC<UserMenuProps> = ({ user }) => {
+  const isOnSettings = typeof window !== "undefined" && window.location.pathname === "/settings";
   const handleLogout = async () => {
     try {
       const response = await fetch("/api/auth/logout", {
@@ -50,10 +51,17 @@ export const UserMenu: React.FC<UserMenuProps> = ({ user }) => {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <a href="/settings" className="cursor-pointer w-full flex items-center">
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Settings</span>
-            </a>
+            {isOnSettings ? (
+              <a href="/" className="cursor-pointer w-full flex items-center">
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                <span>Dashboard</span>
+              </a>
+            ) : (
+              <a href="/settings" className="cursor-pointer w-full flex items-center">
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Settings</span>
+              </a>
+            )}
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
