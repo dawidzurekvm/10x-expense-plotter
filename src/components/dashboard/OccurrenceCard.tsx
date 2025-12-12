@@ -27,7 +27,10 @@ export const OccurrenceCard = ({ occurrence, onEdit, onDelete }: OccurrenceCardP
   // For now, we'll stick to what we have.
 
   return (
-    <Card className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
+    <Card 
+      className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+      data-testid="occurrence-card"
+    >
       <div className="flex items-center gap-4">
         <div
           className={cn(
@@ -38,7 +41,7 @@ export const OccurrenceCard = ({ occurrence, onEdit, onDelete }: OccurrenceCardP
           {isIncome ? "+" : "-"}
         </div>
         <div className="space-y-1">
-          <h4 className="font-medium leading-none">{occurrence.title}</h4>
+          <h4 className="font-medium leading-none" data-testid="occurrence-title">{occurrence.title}</h4>
           <div className="flex items-center text-sm text-muted-foreground">
             <CalendarIcon className="mr-1 h-3 w-3" />
             <span>{format(new Date(occurrence.occurrence_date), "MMM d, yyyy")}</span>

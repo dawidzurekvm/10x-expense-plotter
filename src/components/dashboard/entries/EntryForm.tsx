@@ -96,6 +96,7 @@ export function EntryForm({
                   defaultValue={field.value}
                   value={field.value} // controlled value
                   className="flex space-x-4"
+                  data-testid="entry-type-radio-group"
                 >
                   {ENTRY_TYPES.map((type) => (
                     <FormItem
@@ -103,7 +104,7 @@ export function EntryForm({
                       className="flex items-center space-x-2 space-y-0"
                     >
                       <FormControl>
-                        <RadioGroupItem value={type} />
+                        <RadioGroupItem value={type} data-testid={`entry-type-${type}`} />
                       </FormControl>
                       <FormLabel className="font-normal capitalize">
                         {type}
@@ -125,7 +126,7 @@ export function EntryForm({
               <FormItem>
                 <FormLabel>Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Groceries" {...field} />
+                  <Input placeholder="Groceries" {...field} data-testid="entry-title-input" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -144,6 +145,7 @@ export function EntryForm({
                     placeholder="0.00"
                     {...field}
                     onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                    data-testid="entry-amount-input"
                   />
                 </FormControl>
                 <FormMessage />
@@ -187,6 +189,7 @@ export function EntryForm({
                           "w-full pl-3 text-left font-normal",
                           !field.value && "text-muted-foreground"
                         )}
+                        data-testid="entry-start-date-button"
                       >
                         {field.value ? (
                           format(field.value, "PPP")
@@ -197,7 +200,7 @@ export function EntryForm({
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
+                  <PopoverContent className="w-auto p-0" align="start" data-testid="entry-start-date-popover">
                     <Calendar
                       mode="single"
                       selected={field.value}
@@ -206,6 +209,7 @@ export function EntryForm({
                         date < new Date("1900-01-01")
                       }
                       initialFocus
+                      data-testid="entry-start-date-calendar"
                     />
                   </PopoverContent>
                 </Popover>
@@ -226,13 +230,13 @@ export function EntryForm({
                   value={field.value} // controlled value
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger data-testid="entry-recurrence-select">
                       <SelectValue placeholder="Select recurrence" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
                     {RECURRENCE_TYPES.map((type) => (
-                      <SelectItem key={type} value={type} className="capitalize">
+                      <SelectItem key={type} value={type} className="capitalize" data-testid={`recurrence-option-${type}`}>
                         {type.replace("_", " ")}
                       </SelectItem>
                     ))}
@@ -291,7 +295,7 @@ export function EntryForm({
           />
         )}
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
+        <Button type="submit" className="w-full" disabled={isSubmitting} data-testid="entry-save-button">
           {isSubmitting ? "Saving..." : "Save Entry"}
         </Button>
       </form>

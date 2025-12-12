@@ -15,6 +15,7 @@ export const StartingBalanceOnboardingModal: React.FC<StartingBalanceOnboardingM
         className="sm:max-w-[425px]"
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
+        data-testid="onboarding-modal"
       >
         <DialogHeader>
           <DialogTitle>Welcome to 10x Expense Plotter</DialogTitle>

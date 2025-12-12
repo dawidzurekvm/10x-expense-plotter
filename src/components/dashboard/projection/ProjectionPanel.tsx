@@ -49,6 +49,7 @@ export const ProjectionPanel: React.FC<ProjectionPanelProps> = ({
               max={maxDate}
               className="w-full"
               disabled={isLoading}
+              data-testid="projection-date-input"
             />
           </div>
         </div>

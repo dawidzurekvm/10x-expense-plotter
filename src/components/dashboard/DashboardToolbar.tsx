@@ -91,7 +91,7 @@ export const DashboardToolbar = ({ dateRange, entryType, onFilterChange, onAddCl
           </ToggleGroup>
         </div>
 
-        <Button onClick={onAddClick} className="w-full sm:w-auto">
+        <Button onClick={onAddClick} className="w-full sm:w-auto" data-testid="add-entry-button">
           <Plus className="mr-2 h-4 w-4" />
           Add Entry
         </Button>

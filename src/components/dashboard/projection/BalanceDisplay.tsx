@@ -19,9 +19,12 @@ export const BalanceDisplay: React.FC<BalanceDisplayProps> = ({ amount, isLoadin
   const isNegative = amount !== null && amount < 0;
 
   return (
-    <div className="flex flex-col items-end">
+    <div className="flex flex-col items-end" data-testid="balance-display">
       <span className="text-sm text-muted-foreground">Projected Balance</span>
-      <span className={`text-4xl font-bold tracking-tight ${isNegative ? "text-red-500" : "text-foreground"}`}>
+      <span 
+        className={`text-4xl font-bold tracking-tight ${isNegative ? "text-red-500" : "text-foreground"}`}
+        data-testid="projected-balance-amount"
+      >
         {formattedAmount}
       </span>
     </div>

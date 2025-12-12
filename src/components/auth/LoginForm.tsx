@@ -73,7 +73,7 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="m@example.com" {...field} />
+                <Input placeholder="m@example.com" {...field} data-testid="login-email-input" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -86,13 +86,13 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" {...field} />
+                <Input type="password" {...field} data-testid="login-password-input" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
+        <Button type="submit" className="w-full" disabled={isSubmitting} data-testid="login-submit-button">
           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Sign In
         </Button>

@@ -22,11 +22,11 @@ export const OccurrencesList = ({
   onDeleteClick,
 }: OccurrencesListProps) => {
   return (
-    <div className="space-y-4 py-4">
+    <div className="space-y-4 py-4" data-testid="occurrences-list">
       <h3 className="text-lg font-medium px-1">Recent Activity</h3>
       
       {occurrences.length === 0 && !isLoading ? (
-        <div className="text-center py-8 text-muted-foreground">
+        <div className="text-center py-8 text-muted-foreground" data-testid="occurrences-empty">
           No entries found for the selected period.
         </div>
       ) : (

@@ -54,7 +54,7 @@ export function AddEditEntryDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto" data-testid="entry-dialog">
         <DialogHeader>
           <DialogTitle>{initialData ? "Edit Entry" : "Add New Entry"}</DialogTitle>
           <DialogDescription>

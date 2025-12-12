@@ -50,6 +50,7 @@ export const StartingBalanceForm: React.FC<StartingBalanceFormProps> = ({ onSubm
           step="0.01"
           placeholder="0.00"
           {...register("amount", { valueAsNumber: true })}
+          data-testid="starting-balance-amount-input"
         />
         {errors.amount && <p className="text-sm text-red-500">{errors.amount.message}</p>}
       </div>
@@ -62,11 +63,12 @@ export const StartingBalanceForm: React.FC<StartingBalanceFormProps> = ({ onSubm
           {...register("effective_date", {
             valueAsDate: true,
           })}
+          data-testid="starting-balance-date-input"
         />
         {errors.effective_date && <p className="text-sm text-red-500">{errors.effective_date.message}</p>}
       </div>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <Button type="submit" className="w-full" disabled={isLoading} data-testid="starting-balance-submit-button">
         {isLoading ? "Saving..." : "Set Starting Balance"}
       </Button>
     </form>
