@@ -1,7 +1,7 @@
 /**
  * Generates a unique entry title with timestamp for test isolation
  */
-export function generateUniqueEntryTitle(prefix: string = 'Test Entry'): string {
+export function generateUniqueEntryTitle(prefix = 'Test Entry') {
   const timestamp = Date.now();
   const randomSuffix = Math.random().toString(36).substring(2, 6);
   return `${prefix} ${timestamp}-${randomSuffix}`;

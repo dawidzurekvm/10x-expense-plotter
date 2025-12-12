@@ -80,7 +80,7 @@ export class ProjectionPanel {
     // Handle European number format (e.g., "6 640,00 zł" or "-1 234,56 zł")
     // 1. Remove currency symbols and whitespace used as thousand separators
     // 2. Replace comma with dot for decimal separator
-    let cleanedText = text
+    const cleanedText = text
       .replace(/[^\d,.-]/g, '')  // Keep only digits, comma, dot, minus
       .replace(/\s/g, '')         // Remove any remaining whitespace
       .replace(/\./g, '')         // Remove dots (thousand separators in some formats)

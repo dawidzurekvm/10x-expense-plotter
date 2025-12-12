@@ -18,6 +18,7 @@ dotenv.config({ path: path.resolve(__dirname, '..', '.env.test') });
  * 2. entry_series (self-referencing via parent_series_id)
  * 3. starting_balances
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function globalTeardown(_config: FullConfig) {
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_KEY;

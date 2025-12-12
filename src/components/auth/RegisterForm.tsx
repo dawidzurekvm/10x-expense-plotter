@@ -85,7 +85,7 @@ export function RegisterForm() {
         </div>
         <h3 className="text-lg font-medium">Account Created</h3>
         <p className="text-sm text-muted-foreground">
-          We've sent a confirmation link to your email address. Please verify your
+          We&apos;ve sent a confirmation link to your email address. Please verify your
           account to sign in.
         </p>
         <Button
