@@ -1,14 +1,14 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { createSupabaseServerInstance } from "../../../db/supabase.client";
 
 const changePasswordSchema = z.object({
   newPassword: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
-    const supabase = createSupabaseServerInstance({ cookies, headers: request.headers });
+    // Use supabase client from middleware (has Cloudflare runtime env)
+    const supabase = locals.supabase;
 
     const {
       data: { user },
