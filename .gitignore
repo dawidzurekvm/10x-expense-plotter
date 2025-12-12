@@ -32,3 +32,7 @@ coverage/
 
 # Vitest
 .vitest/
+
+# Playwright auth state
+/playwright/.auth/
+/e2e/.auth/
