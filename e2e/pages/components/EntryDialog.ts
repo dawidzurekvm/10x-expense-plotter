@@ -111,7 +111,7 @@ export class EntryDialog {
     const nextButton = popover.locator('.rdp-button_next');
     const prevButton = popover.locator('.rdp-button_previous');
     
-    // Navigate months
+    // Navigate months by comparing with displayed month, not today's date
     const maxAttempts = 24; // 2 years max navigation
     for (let i = 0; i < maxAttempts; i++) {
       // Check if we're on the right month by looking at the calendar caption
@@ -121,12 +121,39 @@ export class EntryDialog {
         break;
       }
       
-      // Determine direction - check if we need to go forward or backward
-      const now = new Date();
-      if (targetDate > now) {
-        await nextButton.click();
+      // Parse the currently displayed month from the calendar caption
+      // The caption format is like "December 2025"
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+      let displayedDate: Date | null = null;
+      
+      for (const monthName of monthNames) {
+        const regex = new RegExp(`${monthName}\\s+(\\d{4})`);
+        const match = calendarText?.match(regex);
+        if (match) {
+          const displayedYear = parseInt(match[1], 10);
+          const displayedMonth = monthNames.indexOf(monthName);
+          displayedDate = new Date(displayedYear, displayedMonth, 1);
+          break;
+        }
+      }
+      
+      // Determine direction based on displayed month vs target month
+      if (displayedDate) {
+        const targetMonthStart = new Date(year, month - 1, 1);
+        if (targetMonthStart > displayedDate) {
+          await nextButton.click();
+        } else {
+          await prevButton.click();
+        }
       } else {
-        await prevButton.click();
+        // Fallback: if we can't parse the displayed month, use target date vs today
+        const now = new Date();
+        if (targetDate > now) {
+          await nextButton.click();
+        } else {
+          await prevButton.click();
+        }
       }
       
       // Small delay for calendar to update
