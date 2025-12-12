@@ -4,12 +4,6 @@ on:
   push:
     branches: [master]
   workflow_dispatch:
-    inputs:
-      run_e2e:
-        description: 'Run E2E tests'
-        required: false
-        default: false
-        type: boolean
 
 env:
   NODE_VERSION: '20'
@@ -52,14 +46,13 @@ jobs:
           retention-days: 7
 
   # ============================================
-  # E2E tests (optional, requires secrets)
+  # E2E tests (uses 'test' environment secrets)
   # ============================================
   e2e:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: quality
-    if: |
-      github.event_name == 'workflow_dispatch' && github.event.inputs.run_e2e == 'true'
+    environment: test
 
     steps:
       - name: Checkout code
