@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
-import { createSupabaseServerInstance } from "../../../db/supabase.client";
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
     const body = await request.json();
     const { email, password } = body;
@@ -12,7 +11,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       });
     }
 
-    const supabase = createSupabaseServerInstance({ cookies, headers: request.headers });
+    // Use supabase client from middleware (has Cloudflare runtime env)
+    const supabase = locals.supabase;
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
