@@ -17,6 +17,14 @@ import {
 import type { DeleteAccountResponseDTO } from "../../types";
 import { getAuthenticatedUser } from "../../lib/utils/auth.utils";
 
+// Helper to get env var from Cloudflare runtime or fallback to import.meta.env
+function getEnvVar(name: string, runtimeEnv?: Record<string, string>): string {
+  if (runtimeEnv && name in runtimeEnv) {
+    return runtimeEnv[name];
+  }
+  return (import.meta.env as Record<string, string>)[name] ?? "";
+}
+
 // Disable prerendering for API routes
 export const prerender = false;
 
@@ -34,6 +42,9 @@ export const prerender = false;
  */
 export const DELETE: APIRoute = async ({ request, locals }) => {
   const requestId = generateRequestId();
+
+  // Get Cloudflare runtime env (available in production on Cloudflare Pages)
+  const runtimeEnv = locals.runtime?.env as Record<string, string> | undefined;
 
   try {
     // Extract Supabase client from context
@@ -199,7 +210,7 @@ export const DELETE: APIRoute = async ({ request, locals }) => {
 
     // Call the Edge Function to delete the auth user
     // Use SUPABASE_FUNCTIONS_URL for local development, fallback to SUPABASE_URL for production
-    const functionsBaseUrl = import.meta.env.SUPABASE_FUNCTIONS_URL || import.meta.env.SUPABASE_URL;
+    const functionsBaseUrl = getEnvVar("SUPABASE_FUNCTIONS_URL", runtimeEnv) || getEnvVar("SUPABASE_URL", runtimeEnv);
     const edgeFunctionUrl = `${functionsBaseUrl}/functions/v1/delete-account`;
     const edgeFunctionResponse = await fetch(edgeFunctionUrl, {
       method: "DELETE",

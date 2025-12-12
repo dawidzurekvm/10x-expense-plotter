@@ -3,11 +3,8 @@ import { type AstroCookies } from "astro";
 
 import type { Database } from "./database.types.ts";
 
-// Server-side env vars (not exposed to client)
-const supabaseUrl = import.meta.env.SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.SUPABASE_KEY;
-
 // Client-side env vars (must be prefixed with PUBLIC_ to be exposed to browser)
+// These are inlined at build time and safe to use at module level
 const publicSupabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
 const publicSupabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
@@ -25,10 +22,25 @@ function parseCookieHeader(cookieHeader: string): { name: string; value: string 
   });
 }
 
+// Helper to get env var from Cloudflare runtime or fallback to import.meta.env
+function getEnvVar(name: string, runtimeEnv?: Record<string, string>): string {
+  // First try Cloudflare runtime env (available at request time)
+  if (runtimeEnv && name in runtimeEnv) {
+    return runtimeEnv[name];
+  }
+  // Fallback to import.meta.env (for local dev or build-time vars)
+  return (import.meta.env as Record<string, string>)[name] ?? "";
+}
+
 export const createSupabaseServerInstance = (context: {
   headers: Headers;
   cookies: AstroCookies;
+  runtimeEnv?: Record<string, string>;
 }) => {
+  // Get env vars at request time from Cloudflare runtime
+  const supabaseUrl = getEnvVar("SUPABASE_URL", context.runtimeEnv);
+  const supabaseAnonKey = getEnvVar("SUPABASE_KEY", context.runtimeEnv);
+  
   return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookieOptions,
     cookies: {

@@ -1,7 +1,15 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@supabase/supabase-js";
 
-export const POST: APIRoute = async ({ request }) => {
+// Helper to get env var from Cloudflare runtime or fallback to import.meta.env
+function getEnvVar(name: string, runtimeEnv?: Record<string, string>): string {
+  if (runtimeEnv && name in runtimeEnv) {
+    return runtimeEnv[name];
+  }
+  return (import.meta.env as Record<string, string>)[name] ?? "";
+}
+
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
     const body = await request.json();
     const { email, password } = body;
@@ -12,10 +20,13 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
+    // Get Cloudflare runtime env (available in production on Cloudflare Pages)
+    const runtimeEnv = locals.runtime?.env as Record<string, string> | undefined;
+
     // Create a Supabase client without session persistence to prevent auto-login
     const supabase = createClient(
-      import.meta.env.SUPABASE_URL,
-      import.meta.env.SUPABASE_KEY,
+      getEnvVar("SUPABASE_URL", runtimeEnv),
+      getEnvVar("SUPABASE_KEY", runtimeEnv),
       {
         auth: {
           persistSession: false,
